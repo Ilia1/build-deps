@@ -29,82 +29,25 @@ jobs:
   build:
     name: Build ${{ matrix.build }} (${{ matrix.name }})
     runs-on: ${{ matrix.os }}
+    container:
+      image: 'ghcr.io/void-linux/void-musl-full:20250616R1'
     strategy:
       fail-fast: false
       matrix:
         include:
           # name: ${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}
-          - name: Linux-x86_64
+          - name: Linux-x86_64-musl
             os: ubuntu-22.04
             arch: x86_64
             generator: "Unix Makefiles"
             shell: bash
             build: ALL
-          - name: Linux-aarch64
+          - name: Linux-aarch64-musl
             os: ubuntu-22.04
             arch: aarch64
             generator: "Unix Makefiles"
             shell: bash
             target: aarch64-linux-gnu
-            build: ALL
-          - name: Linux-ppc64le
-            os: ubuntu-22.04
-            arch: powerpc64le
-            generator: "Unix Makefiles"
-            shell: bash
-            target: powerpc64le-linux-gnu
-            build: ALL
-          - name: Darwin-x86_64
-            os: macos-13
-            arch: x86_64
-            generator: "Unix Makefiles"
-            shell: bash
-            target: x86_64-apple-macosx
-            build: ALL
-          - name: Darwin-arm64
-            os: macos-14
-            arch: aarch64
-            generator: "Unix Makefiles"
-            shell: bash
-            target: arm64-apple-macosx
-            build: ALL
-          - name: Windows-AMD64
-            os: windows-2022
-            arch: x86_64
-            generator: "MSYS Makefiles"
-            shell: msys2 {0}
-            msystem: ucrt64
-            toolchain: ucrt-x86_64
-            build: BOOST
-          - name: Windows-AMD64
-            os: windows-2022
-            arch: x86_64
-            generator: "MSYS Makefiles"
-            shell: msys2 {0}
-            msystem: ucrt64
-            toolchain: ucrt-x86_64
-            build: FFMPEG
-          - name: Windows-ARM64
-            os: windows-11-arm
-            arch: aarch64
-            generator: "MSYS Makefiles"
-            shell: msys2 {0}
-            msystem: clangarm64
-            toolchain: clang-aarch64
-            build: ALL
-          - name: FreeBSD-amd64
-            os: ubuntu-latest
-            arch: x86_64
-            bsd_release: '14.3'
-            generator: "Unix Makefiles"
-            shell: freebsd {0}
-            build: ALL
-          - name: FreeBSD-aarch64
-            os: ubuntu-latest  # ubuntu-24.04-arm is slower with the FreeBSD VM
-            arch: aarch64
-            bsd_release: '14.3'
-            generator: "Unix Makefiles"
-            shell: freebsd {0}
             build: ALL
     defaults:
       run:
@@ -168,6 +111,7 @@ jobs:
             "texinfo"
             "wget"
             "zlib1g-dev"
+            "musl-tools"
           )
 
           package_arch="amd64"
@@ -489,6 +433,10 @@ jobs:
             export CC=$(which clang${{ env.FREEBSD_CLANG_VERSION }})
             export CXX=$(which clang++${{ env.FREEBSD_CLANG_VERSION }})
 
+          if [ "${{ endsWith(matrix.name, 'musl') }}" = true ]; then
+            export CC=$(whereis musl-gcc }})
+            export CXX=$(whereis musl-gcc }})
+
             # make sure they exist
             if [ ! -f "$CC" ]; then
               echo "Compiler not found: $CC"
@@ -510,6 +458,7 @@ jobs:
             -DCMAKE_TOOLCHAIN_FILE=${{ env.CMAKE_TOOLCHAIN_FILE }} \
             -DCMAKE_INSTALL_PREFIX="${{ env.ROOT_PATH }}/build/dist" \
             -DPARALLEL_BUILDS=${{ steps.processor_count.outputs.PROCESSOR_COUNT || 1 }}
+            -DBUILD_FFMPEG_NV_CODEC_HEADERS=${{ ! endsWith(matrix.name, 'musl') }}
 
       - name: Build
         run: |
