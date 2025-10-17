@@ -455,7 +455,7 @@ jobs:
             -DBUILD_${{ matrix.build }}=ON \
             -DCMAKE_TOOLCHAIN_FILE=${{ env.CMAKE_TOOLCHAIN_FILE }} \
             -DCMAKE_INSTALL_PREFIX="${{ env.ROOT_PATH }}/build/dist" \
-            -DPARALLEL_BUILDS=${{ steps.processor_count.outputs.PROCESSOR_COUNT || 1 }}
+            -DPARALLEL_BUILDS=${{ steps.processor_count.outputs.PROCESSOR_COUNT || 1 }} \
             -DBUILD_FFMPEG_NV_CODEC_HEADERS=${{ ! endsWith(matrix.name, 'musl') }}
 
       - name: Build
