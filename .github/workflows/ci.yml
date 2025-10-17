@@ -432,8 +432,8 @@ jobs:
             export CXX=$(which clang++${{ env.FREEBSD_CLANG_VERSION }})
 
           if [ "${{ endsWith(matrix.name, 'musl') }}" = true ]; then
-            export CC=$(whereis musl-gcc }})
-            export CXX=$(whereis musl-gcc }})
+            export CC=$(which musl-gcc }})
+            export CXX=$(which musl-gcc }})
 
             # make sure they exist
             if [ ! -f "$CC" ]; then
