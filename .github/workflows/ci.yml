@@ -431,9 +431,10 @@ jobs:
             export CC=$(which clang${{ env.FREEBSD_CLANG_VERSION }})
             export CXX=$(which clang++${{ env.FREEBSD_CLANG_VERSION }})
 
+          else
           if [ "${{ endsWith(matrix.name, 'musl') }}" = true ]; then
-            export CC=$(which musl-gcc }})
-            export CXX=$(which musl-gcc }})
+            export CC=$(which musl-gcc )
+            export CXX=$(which musl-gcc )
 
             # make sure they exist
             if [ ! -f "$CC" ]; then
@@ -445,6 +446,7 @@ jobs:
               exit 1
             fi
           fi
+          
 
           mkdir -p ./build/dist
           cmake \
