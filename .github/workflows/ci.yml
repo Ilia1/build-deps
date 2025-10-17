@@ -110,6 +110,7 @@ jobs:
             "wget"
             "zlib1g-dev"
             "musl-tools"
+            "musl-dev"
           )
 
           package_arch="amd64"
